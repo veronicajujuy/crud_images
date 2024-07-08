@@ -37,6 +37,13 @@ public class S3Controller {
         return s3Service.renameFile(oldFileName, newFileName);
     }
 
+    @PutMapping("/update/{oldFileName}")
+    public String updateFile(@RequestParam("file")MultipartFile file,
+                             @PathVariable("oldFileName") String oldFileName
+    ) throws IOException {
+        return s3Service.updateFile(file, oldFileName);
+    }
+
     @DeleteMapping("/delete/{fileName}")
     public String deleteFile(@PathVariable("fileName") String fileName) throws IOException {
         return s3Service.deleteFile(fileName);

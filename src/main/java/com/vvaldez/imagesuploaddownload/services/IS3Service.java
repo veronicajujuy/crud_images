@@ -11,4 +11,5 @@ public interface IS3Service {
     List<String> listFiles() throws IOException;
     String deleteFile(String fileName) throws IOException;
     String renameFile(String oldFileName, String newFileName) throws IOException;
+    String updateFile(MultipartFile file, String oldFileName) throws IOException;
 }

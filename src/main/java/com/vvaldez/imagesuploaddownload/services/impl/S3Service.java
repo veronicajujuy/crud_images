@@ -108,6 +108,29 @@ public class S3Service implements IS3Service {
     }
 
     @Override
+    public String updateFile(MultipartFile file, String oldFileName) throws IOException {
+        if(!doesObjectExists(oldFileName)){
+            return "El archivo introducido no existe";
+        }
+
+        try{
+            String newFileName = file.getOriginalFilename();
+            deleteFile(oldFileName);
+
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(newFileName)
+                    .build();
+
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
+            return "El archivo fue modificado correctamente";
+
+        }catch (S3Exception e){
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    @Override
     public String deleteFile(String fileName) throws IOException {
         if(!doesObjectExists(fileName)){
             return "El archivo introducido no existe";
