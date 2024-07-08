@@ -27,6 +27,7 @@ public class S3Service implements IS3Service {
         this.s3Client = s3Client;
     }
 
+    @Override
     public String uploadFile(MultipartFile file) throws IOException {
         try{
             String fileName = file.getOriginalFilename();
@@ -42,6 +43,7 @@ public class S3Service implements IS3Service {
         }
     }
 
+    @Override
     public String downloadFile(String fileName) throws IOException {
         if(!doesObjectExists(fileName)){
             return  "El archivo introducido no existe";
@@ -64,6 +66,7 @@ public class S3Service implements IS3Service {
         return "Archivo descargado correctamente";
     }
 
+    @Override
     public List<String> listFiles() throws IOException {
         try{
             ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder()
@@ -80,6 +83,47 @@ public class S3Service implements IS3Service {
         }catch (S3Exception e){
             throw new IOException(e.getMessage());
         }
+    }
+
+    @Override
+    public String renameFile(String oldFileName, String newFileName) throws IOException {
+        if(!doesObjectExists(oldFileName)){
+            return "El archivo introducido no existe";
+        }
+
+        try{
+            CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
+                    .destinationBucket(bucketName)
+                    .sourceBucket(bucketName)
+                    .sourceKey(oldFileName)
+                    .destinationKey(newFileName)
+                    .build();
+            s3Client.copyObject(copyObjectRequest);
+            deleteFile(oldFileName);
+            return "El archivo fue renombrado correctamente";
+
+        }catch (S3Exception e){
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    @Override
+    public String deleteFile(String fileName) throws IOException {
+        if(!doesObjectExists(fileName)){
+            return "El archivo introducido no existe";
+        }
+        try{
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileName)
+                    .build();
+            s3Client.deleteObject(deleteObjectRequest);
+            return "El archivo fue borrado correctamente";
+
+        }catch (S3Exception e){
+            throw new IOException(e.getMessage());
+        }
+
     }
 
     private boolean doesObjectExists(String objectKey){
